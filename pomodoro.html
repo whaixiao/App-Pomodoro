@@ -6,7 +6,7 @@
     <title>Pomodoro Profesional</title>
     <style>
         :root {
-            --bg-color: #000000; /* Negro puro para OLED */
+            --bg-color: #000000;
             --surface-color: #121212;
             --primary-color: #bb86fc;
             --text-color: #e0e0e0;
@@ -16,15 +16,15 @@
 
         body {
             margin: 0;
-            padding: 0;
+            padding: 2rem 1rem;
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            height: 100vh;
-            user-select: none;
+            min-height: 100vh;
+            box-sizing: border-box;
         }
 
         .container {
@@ -35,6 +35,8 @@
             text-align: center;
             max-width: 400px;
             width: 100%;
+            margin-bottom: 2rem;
+            margin-top: auto;
         }
 
         .tabs {
@@ -68,6 +70,7 @@
             margin: 2rem 0;
             font-variant-numeric: tabular-nums;
             letter-spacing: -2px;
+            user-select: none;
         }
 
         .controls {
@@ -115,6 +118,62 @@
             color: #888;
             min-height: 1.5em;
         }
+
+        /* Estilos del desplegable de información */
+        .info-section {
+            max-width: 400px;
+            width: 100%;
+            background-color: var(--surface-color);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: auto;
+        }
+
+        details {
+            padding: 1.5rem;
+        }
+
+        summary {
+            font-weight: bold;
+            cursor: pointer;
+            color: var(--primary-color);
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        summary::after {
+            content: '▼';
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+        }
+
+        details[open] summary::after {
+            transform: rotate(180deg);
+        }
+
+        .info-content {
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #b3b3b3;
+            text-align: left;
+        }
+
+        .info-content ol {
+            padding-left: 1.2rem;
+            margin-top: 1rem;
+        }
+
+        .info-content li {
+            margin-bottom: 0.8rem;
+        }
     </style>
 </head>
 <body>
@@ -136,6 +195,22 @@
         <div class="status-text" id="status-message">Tiempo de enfocarse.</div>
     </div>
 
+    <!-- Nueva sección desplegable -->
+    <div class="info-section">
+        <details>
+            <summary>¿Qué es el Método Pomodoro?</summary>
+            <div class="info-content">
+                <p>El método Pomodoro es una técnica de gestión del tiempo diseñada para maximizar la <strong>eficiencia</strong> y prevenir la fatiga mental durante el trabajo o el estudio.</p>
+                <ol>
+                    <li><strong>Enfoque total (25 min):</strong> Trabaja en una sola tarea sin interrupciones. Cero distracciones.</li>
+                    <li><strong>Descanso corto (5 min):</strong> Alerta tu mente. Levántate, estira las piernas o bebe agua.</li>
+                    <li><strong>Ciclos:</strong> Repite este proceso 4 veces.</li>
+                    <li><strong>Descanso largo (15 min):</strong> Tras completar 4 ciclos de enfoque, toma un descanso prolongado para asimilar la información y recuperar energía.</li>
+                </ol>
+            </div>
+        </details>
+    </div>
+
     <script>
         const MODES = {
             pomodoro: { time: 25 * 60, message: "Tiempo de enfocarse." },
@@ -154,22 +229,19 @@
         const statusMessage = document.getElementById('status-message');
         const tabBtns = document.querySelectorAll('.tab-btn');
 
-        // Formatear tiempo a MM:SS
         function formatTime(seconds) {
             const m = Math.floor(seconds / 60).toString().padStart(2, '0');
             const s = (seconds % 60).toString().padStart(2, '0');
             return `${m}:${s}`;
         }
 
-        // Actualizar la interfaz
         function updateDisplay() {
             timeDisplay.textContent = formatTime(timeLeft);
             document.title = `${formatTime(timeLeft)} - ${currentMode === 'pomodoro' ? 'Enfoque' : 'Descanso'}`;
         }
 
-        // Cambiar de modo (Pomodoro, Descanso)
         function switchMode(mode) {
-            if (isRunning) toggleTimer(); // Pausa si está corriendo
+            if (isRunning) toggleTimer(); 
             
             currentMode = mode;
             timeLeft = MODES[mode].time;
@@ -183,7 +255,6 @@
             updateDisplay();
         }
 
-        // Lógica del temporizador
         function toggleTimer() {
             if (isRunning) {
                 clearInterval(timerInterval);
@@ -214,11 +285,10 @@
         }
 
         function notifyUser() {
-            // Sonido simple usando Web Audio API
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
             const osc = ctx.createOscillator();
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(880, ctx.currentTime); // Nota A5
+            osc.frequency.setValueAtTime(880, ctx.currentTime); 
             osc.connect(ctx.destination);
             osc.start();
             osc.stop(ctx.currentTime + 0.5);
@@ -226,14 +296,12 @@
             statusMessage.textContent = "¡Sesión terminada!";
         }
 
-        // Event Listeners
         startBtn.addEventListener('click', toggleTimer);
         resetBtn.addEventListener('click', resetTimer);
         tabBtns.forEach(btn => {
             btn.addEventListener('click', () => switchMode(btn.dataset.mode));
         });
 
-        // Inicialización
         updateDisplay();
     </script>
 </body>
